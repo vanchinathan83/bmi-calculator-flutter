@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'constants.dart';
+import 'gender.dart';
 import 'reusable_card.dart';
 import 'reusable_icon.dart';
-
-const BOTTOM_CONTAINER_HEIGHT = 80.0;
-const ACTIVE_CARD_COLOR = Color(0XFF1D1E33);
-const INACTIVE_CARD_COLOR = Color(0xFF111328);
 
 class InputPage extends StatefulWidget {
   @override
@@ -14,26 +12,8 @@ class InputPage extends StatefulWidget {
 }
 
 class _InputPageState extends State<InputPage> {
-  Color maleCardColor = INACTIVE_CARD_COLOR;
-  Color femaleCardColor = ACTIVE_CARD_COLOR;
-
-  void updateColor(int gender) {
-    if (gender == 1) {
-      if (maleCardColor == INACTIVE_CARD_COLOR) {
-        maleCardColor = ACTIVE_CARD_COLOR;
-        femaleCardColor = INACTIVE_CARD_COLOR;
-      } else {
-        maleCardColor = INACTIVE_CARD_COLOR;
-      }
-    } else {
-      if (femaleCardColor == INACTIVE_CARD_COLOR) {
-        femaleCardColor = ACTIVE_CARD_COLOR;
-        maleCardColor = INACTIVE_CARD_COLOR;
-      } else {
-        femaleCardColor = INACTIVE_CARD_COLOR;
-      }
-    }
-  }
+  Gender selectedGender;
+  int height = 180;
 
   @override
   Widget build(BuildContext context) {
@@ -42,34 +22,35 @@ class _InputPageState extends State<InputPage> {
           title: Text('BMI CALCULATOR'),
         ),
         body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               child: Row(
                 children: [
                   Expanded(
-                      child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        updateColor(1);
-                      });
-                    },
-                    child: ReusableCard(
-                        color: maleCardColor,
-                        childWidget: ReusableIcon(
-                            label: "MALE", icon: FontAwesomeIcons.mars)),
-                  )),
+                      child: ReusableCard(
+                          onPress: () {
+                            setState(() {
+                              this.selectedGender = Gender.MALE;
+                            });
+                          },
+                          color: selectedGender == Gender.MALE
+                              ? kActiveCardColor
+                              : kInactiveCardColor,
+                          childWidget: ReusableIcon(
+                              label: "MALE", icon: FontAwesomeIcons.mars))),
                   Expanded(
-                      child: GestureDetector(
-                    onTap: () {
+                      child: ReusableCard(
+                    onPress: () {
                       setState(() {
-                        updateColor(2);
+                        this.selectedGender = Gender.FEMALE;
                       });
                     },
-                    child: ReusableCard(
-                      color: femaleCardColor,
-                      childWidget: ReusableIcon(
-                          label: "FEMALE", icon: FontAwesomeIcons.venus),
-                    ),
+                    color: selectedGender == Gender.FEMALE
+                        ? kActiveCardColor
+                        : kInactiveCardColor,
+                    childWidget: ReusableIcon(
+                        label: "FEMALE", icon: FontAwesomeIcons.venus),
                   )),
                 ],
               ),
@@ -77,22 +58,54 @@ class _InputPageState extends State<InputPage> {
             Expanded(
               child: Row(
                 children: [
-                  Expanded(child: ReusableCard(color: ACTIVE_CARD_COLOR)),
+                  Expanded(
+                      child: ReusableCard(
+                          color: kActiveCardColor,
+                          childWidget: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("HEIGHT", style: kTextStyle),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
+                                children: [
+                                  Text(
+                                    this.height.toString(),
+                                    style: kNumberTextStyle,
+                                  ),
+                                  Text("cm")
+                                ],
+                              ),
+                              Slider(
+                                value: this.height.toDouble(),
+                                activeColor: Color(0xFFEB1555),
+                                inactiveColor: Color(0xFF8D8E98),
+                                min: 120.0,
+                                max: 220.0,
+                                onChanged: (double newValue) {
+                                  setState(() {
+                                    this.height = newValue.round();
+                                  });
+                                },
+                              )
+                            ],
+                          ))),
                 ],
               ),
             ),
             Expanded(
               child: Row(
                 children: [
-                  Expanded(child: ReusableCard(color: ACTIVE_CARD_COLOR)),
-                  Expanded(child: ReusableCard(color: ACTIVE_CARD_COLOR)),
+                  Expanded(child: ReusableCard(color: kActiveCardColor)),
+                  Expanded(child: ReusableCard(color: kActiveCardColor)),
                 ],
               ),
             ),
             Container(
               margin: EdgeInsets.only(top: 10.0),
               width: double.infinity,
-              height: BOTTOM_CONTAINER_HEIGHT,
+              height: kBottomContainerHeight,
               color: Colors.pink,
             )
           ],
